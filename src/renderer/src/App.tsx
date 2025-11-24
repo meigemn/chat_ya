@@ -1,4 +1,5 @@
 import { Routes, Route, useNavigate } from 'react-router-dom';
+
 import Lobby from './pages/Lobby';
 
 function App(): React.JSX.Element {
@@ -18,7 +19,7 @@ function Home() {
   };
 
   return (
-    <div id='envoltorio-icono-texto-boton' className='border border-red-600'>
+    <div id='envoltorio-icono-texto-boton' className='border '>
       <div id='envoltorio-icono-texto' className='border flex flex-col items-center w-60'>
         <div id='icono-chat-ya' className='bg-blue-400 rounded-full w-20 h-20 flex items-center justify-center text-white'>
           icono

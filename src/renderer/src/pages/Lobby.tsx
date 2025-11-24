@@ -1,30 +1,50 @@
-import { FC } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+// CAMBIA a importación nombrada
+import { LobbyLayout } from '../components/Lobby/LobbyLayout';
+import ChatContent, { Message } from '../components/Chat/ChatContent/Index';
+import ChatList from '../components/Lobby/ChatList';
+import HomeButton from '@renderer/components/Lobby/HomeButton';
 
-const Lobby: FC = () => {
-    const navigate = useNavigate();
-    const goToHome = () => {
-        navigate('/');
-    }
+// Mock data
+const mockChats = [
+    { id: '1', name: 'Grupo Desarrollo', lastMessage: 'Último mensaje' },
+    { id: '2', name: 'Sala General', lastMessage: 'Hola a todos' }
+];
+
+const MOCK_CHAT_NAME = "Grupo de Desarrolladores";
+
+const Lobby: React.FC = () => {
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [nextId, setNextId] = useState(1);
+
+    const handleSendMessage = (text: string) => {
+        const newMessage: Message = {
+            id: nextId.toString(),
+            text,
+            sender: 'me',
+            timestamp: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+        };
+        setMessages(prev => [...prev, newMessage]);
+        setNextId(prev => prev + 1);
+    };
+
+    const handleSelectChat = (id: string) => {
+        console.log('Chat seleccionado:', id);
+    };
+
     return (
-        <>
-            <div id='envoltorio-contenido-lobby' className=' w-screen h-screen border border-purple-700 px-4 flex flex-col justify-start'>
-                <button onClick={goToHome} className=' w-20 rounded-md border-2 border-green-500 ml-4 px-4 py-2 text-green-500 hover:bg-green-500 hover:text-white transition'>
-                    Home
-                </button>
-                <div id='envoltorio-contenido-lobby' className='border border-yellow-400  flex justify-center w-full '>
-                    <div id='titulo-lobby' className='w-full border border-red-500 '>
-                        <div className='border border-blue-600  bg-sky-500 flex justify-center mt-4 rounded-md '>
-                            <p>Página del lobby</p>
-                        </div>
-                        <div className='border flex flex-row' >
-                            <p className='border border-lime-500 w-[40vw]' >izquierd </p>
-                            <p className='w-[60vw] border'>derecho</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </>
-    )
-}
+        <LobbyLayout
+        chatList={<ChatList chats={mockChats} onSelectChat={handleSelectChat} />}
+        chatArea={
+                
+                <ChatContent
+                chatName={MOCK_CHAT_NAME}
+                messages={messages}
+                onSendMessage={handleSendMessage}
+                />
+            }
+            />
+    );
+};
+
 export default Lobby;
