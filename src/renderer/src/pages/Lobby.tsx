@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { LobbyLayout } from '../components/Lobby/LobbyLayout';
 import ChatContent, { Message } from '../components/Chat/ChatContent/Index';
 import ChatList from '../components/Lobby/ChatList';
-import HomeButton from '@renderer/components/Lobby/HomeButton';
+import CreateChatButton from '@renderer/components/Lobby/CreateChatButton';
 
 // Mock data
 const mockChats = [
@@ -33,17 +33,19 @@ const Lobby: React.FC = () => {
     };
 
     return (
+        <>
         <LobbyLayout
         chatList={<ChatList chats={mockChats} onSelectChat={handleSelectChat} />}
         chatArea={
-                
-                <ChatContent
-                chatName={MOCK_CHAT_NAME}
-                messages={messages}
-                onSendMessage={handleSendMessage}
-                />
-            }
+            
+            <ChatContent
+            chatName={MOCK_CHAT_NAME}
+            messages={messages}
+            onSendMessage={handleSendMessage}
             />
+        }
+        />
+        </>
     );
 };
 
