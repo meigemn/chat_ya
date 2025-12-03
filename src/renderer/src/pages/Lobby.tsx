@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { LobbyLayout } from '../components/Lobby/LobbyLayout';
 import ChatContent, { Message } from '../components/Chat/ChatContent/Index';
 import ChatList from '../components/Lobby/ChatList';
-import CreateChatButton from '@renderer/components/Lobby/CreateChatButton';
+import CreateChatButton from '@renderer/components/Lobby/CreateRoomButton';
 
 // Mock data
 const mockChats = [
