@@ -24,7 +24,6 @@ const CreateRoomButton: React.FC = () => {
             // El hook devuelve el ID si fue exitoso
             alert(`Sala creada con éxito. ID: ${newRoomId}`);
             setRoomName(''); 
-            // 💡 Aquí podrías añadir lógica de navegación o recarga de la lista de salas
         }
         // Si hay error, el hook ya lo maneja y se mostrará abajo.
     };
@@ -53,7 +52,7 @@ const CreateRoomButton: React.FC = () => {
                         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
                     disabled={isLoading}
                 >
-                    {isLoading ? 'Creando Sala...' : '🚀 Crear Sala'}
+                    {isLoading ? 'Creando Sala...' : 'Crear Sala'}
                 </button>
             </form>
             

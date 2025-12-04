@@ -1,4 +1,3 @@
-// src/components/Lobby/ChatItem.tsx
 import React from 'react';
 
 interface ChatItemProps {

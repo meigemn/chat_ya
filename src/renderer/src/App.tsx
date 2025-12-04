@@ -1,7 +1,7 @@
 import { Routes, Route, useNavigate } from 'react-router-dom';
 
 import Lobby from './pages/Lobby';
-
+import Login from './components/Login/Login'
 function App(): React.JSX.Element {
   return (
     <Routes>
@@ -30,6 +30,9 @@ function Home() {
           </div>
           <div id='descripcion-chat-ya'>
             Chat en tiempo real
+          </div>
+          <div>
+            <Login />
           </div>
         </div>
       </div>
