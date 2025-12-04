@@ -4,7 +4,7 @@ import { CreateRoomDto, CreateEditRemoveDto } from '../types';
 
 // --- PLACHOLDER: Función de fetch autenticado (DEBES IMPLEMENTARLA) ---
 async function authenticatedFetch(url: string, options: RequestInit): Promise<any> {
-    const token = localStorage.getItem('jwtToken');
+    const token = localStorage.getItem('authToken');
     if (!token) throw new Error('Usuario no autenticado.');
 
     const headers = {

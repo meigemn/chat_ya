@@ -8,13 +8,13 @@ interface LobbyLayoutProps {
 }
 
 /**
- * Define el layout de dos columnas: lista de chats a la izquierda, área de chat a la derecha.
+ * Define el layout de dos columnas: lista de chats a la izquierda, área de chat a la derechça.
  * Se asume que usa el 100% de la altura y un ancho máximo en el centro de la pantalla.
  */
 export const LobbyLayout: React.FC<LobbyLayoutProps> = ({ chatList, chatArea }) => {
     console.log('LobbyLayout renderizado'); //Para testeo
     return (
-        <div className="flex h-screen w-full bg-gray-50 p-4">
+        <div className="flex h-screen  bg-gray-50 p-4 border ">
             <LogoutButton/>
             <CreateRoomButton/>
             {/* Columna Izquierda: Lista de Chats - 25% de ancho (o ancho fijo) */}

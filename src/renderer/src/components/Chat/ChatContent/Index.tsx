@@ -29,7 +29,7 @@ export const ChatContent: React.FC<ChatContentProps> = ({
     // Si la lista está vacía, se usa 'flex-1' para que la lista de mensajes ocupe
     // el espacio y centre el mensaje de "No hay mensajes".
     return (
-        <div className="flex flex-col h-full bg-white rounded-lg shadow-xl border border-gray-200">
+        <div className="flex flex-col h-full bg-white rounded-lg shadow-xl border border-grey-800 ">
             <ChatHeader chatName={chatName} />
             {/* flex-1 asegura que la lista de mensajes use todo el espacio restante */}
             <MessageList messages={messages} />
