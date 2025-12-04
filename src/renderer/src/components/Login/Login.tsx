@@ -124,6 +124,15 @@ export default function Login() {
                 <h2 className="text-center text-3xl font-extrabold text-white-900">
                     Iniciar Sesión
                 </h2>
+                <div>
+                    Credenciales:
+                    <ul className="list-disc list-inside text-sm text-gray-700">
+                        <li className='select-text '>
+                            Email: usuarioChatYa@gmail.com
+                        </li>
+                        <li className='select-text '>Contraseña: usuarioChatYa1234! </li>
+                    </ul>
+                </div>
 
                 {/* Asignamos el manejador de envío al formulario */}
                 <form className="space-y-4" onSubmit={handleSubmit}>

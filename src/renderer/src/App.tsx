@@ -36,14 +36,7 @@ function Home() {
           </div>
         </div>
       </div>
-      <div id='boton-redireccion-lobby' className='flex justify-start mt-4'>
-        <button
-          onClick={goToLobby}
-          className='rounded-full border-2 border-blue-500 px-4 py-2 text-blue-500 hover:bg-blue-500 hover:text-white transition'
-        >
-          Lobby
-        </button>
-      </div>
+
     </div>
   );
 }

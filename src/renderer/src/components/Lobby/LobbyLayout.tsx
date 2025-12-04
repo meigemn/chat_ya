@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react';
-import HomeButton from './HomeButton';
 import CreateRoomButton from './CreateRoomButton';
-
+import LogoutButton from './LogoutButton';
 
 interface LobbyLayoutProps {
     chatList: ReactNode;
@@ -16,7 +15,7 @@ export const LobbyLayout: React.FC<LobbyLayoutProps> = ({ chatList, chatArea }) 
     console.log('LobbyLayout renderizado'); //Para testeo
     return (
         <div className="flex h-screen w-full bg-gray-50 p-4">
-            <HomeButton/>
+            <LogoutButton/>
             <CreateRoomButton/>
             {/* Columna Izquierda: Lista de Chats - 25% de ancho (o ancho fijo) */}
             <div className="w-1/4 min-w-[300px] max-w-[400px] mr-4 h-full">
