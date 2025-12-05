@@ -34,17 +34,17 @@ const Lobby: React.FC = () => {
 
     return (
         <>
-        <LobbyLayout
-        chatList={<ChatList chats={mockChats} onSelectChat={handleSelectChat} />}
-        chatArea={
-            
-            <ChatContent
-            chatName={MOCK_CHAT_NAME}
-            messages={messages}
-            onSendMessage={handleSendMessage}
+            <LobbyLayout
+                chatList={<ChatList chats={mockChats} onSelectChat={handleSelectChat} />}
+                chatArea={
+
+                    <ChatContent
+                        chatName={MOCK_CHAT_NAME}
+                        messages={messages}
+                        onSendMessage={handleSendMessage}
+                    />
+                }
             />
-        }
-        />
         </>
     );
 };

@@ -16,7 +16,7 @@ export const LobbyLayout: React.FC<LobbyLayoutProps> = ({ chatList, chatArea }) 
     return (
         <div className="flex h-screen  bg-gray-50 p-4 border ">
             <LogoutButton/>
-            <CreateRoomButton/>
+            <CreateRoomButton onRoomCreated={}/>
             {/* Columna Izquierda: Lista de Chats - 25% de ancho (o ancho fijo) */}
             <div className="w-1/4 min-w-[300px] max-w-[400px] mr-4 h-full">
                 {chatList}

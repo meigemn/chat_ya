@@ -1,15 +1,12 @@
 // src/components/Chat/ChatContent/MessageInput.tsx
 import React, { useState } from 'react';
-
-interface MessageInputProps {
-    onSend: (text: string) => void;
-}
-
-export const MessageInput: React.FC<MessageInputProps> = ({ onSend }) => {
+import { MessageInputProps } from '@renderer/types/chat';
+export const MessageInput: React.FC<MessageInputProps> = ({ onSend,isDisabled }) => {
     const [newMessage, setNewMessage] = useState('');
 
     const handleSend = () => {
-        if (newMessage.trim() === '') return;
+        // No enviar si está deshabilitado
+        if (isDisabled || newMessage.trim() === '') return; 
         onSend(newMessage);
         setNewMessage('');
     };

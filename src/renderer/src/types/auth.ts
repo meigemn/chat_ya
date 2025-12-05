@@ -40,3 +40,14 @@ export interface IGenericError {
     message: string; // Mensaje de error (e.g., "Credenciales inválidas.")
     code: string;    // Código interno (e.g., "Auth.Login")
 }
+
+export interface AuthState {
+    token: string | null;
+    user: Object | null;
+}
+
+export interface AuthContextType extends AuthState {
+    login: (authData: { token: string; user: Object }) => void;
+    logout: () => void;
+    isAuthenticated: boolean;
+}

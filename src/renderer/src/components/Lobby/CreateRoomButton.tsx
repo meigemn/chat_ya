@@ -1,12 +1,20 @@
+// Frontend/components/CreateRoomButton.tsx
 import React, { useState } from 'react';
-// Asegúrate de que esta importación sea correcta (por ejemplo, '@/hooks/useRoomActions')
+import { useNavigate } from 'react-router-dom'; // 👈 Importar para navegación
 import { useCreateRoom } from '../../hooks/UseRoomActions'; 
+import { ChatRoomDto } from '@renderer/types';
 
-const CreateRoomButton: React.FC = () => {
+// Definir la prop que el componente padre usará para actualizar la lista
+interface CreateRoomButtonProps {
+    onRoomCreated: (room: ChatRoomDto) => void;
+}
+
+const CreateRoomButton: React.FC<CreateRoomButtonProps> = ({ onRoomCreated }) => {
     const [roomName, setRoomName] = useState('');
+    const navigate = useNavigate(); // Hook de navegación
     
-    // Usamos el hook y obtenemos el ID de la sala creada (successId)
-    const { createRoom, successId, isLoading, error } = useCreateRoom();
+    // El hook ahora devuelve el objeto ChatRoomDto o null
+    const { createRoom, isLoading, error } = useCreateRoom(); 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -17,15 +25,19 @@ const CreateRoomButton: React.FC = () => {
             return;
         }
         
-        // Llamada al hook con el payload CreateRoomDto
-        const newRoomId = await createRoom({ chatRoomName: trimmedName });
+        // Llamamos a createRoom, que devuelve ChatRoomDto | null
+        const newRoom = await createRoom({ chatRoomName: trimmedName });
         
-        if (newRoomId) {
-            // El hook devuelve el ID si fue exitoso
-            alert(`Sala creada con éxito. ID: ${newRoomId}`);
+        if (newRoom) {
+            alert(`Sala creada con éxito. ID: ${newRoom.id}`);
             setRoomName(''); 
+            
+            // 1. Notificar al padre para que actualice la lista visible
+            onRoomCreated(newRoom); 
+            
+            // 2. Navegar inmediatamente a la sala creada
+            navigate(`/chat/${newRoom.id}`); 
         }
-        // Si hay error, el hook ya lo maneja y se mostrará abajo.
     };
 
     return (
@@ -33,6 +45,7 @@ const CreateRoomButton: React.FC = () => {
             <h3 className="text-xl font-bold mb-4 text-gray-800">Crear Nueva Sala de Chat</h3>
             
             <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Input de sala (Mantenido) */}
                 <input
                     type="text"
                     value={roomName}
@@ -42,6 +55,7 @@ const CreateRoomButton: React.FC = () => {
                     disabled={isLoading}
                 />
                 
+                {/* Botón de envío (Mantenido) */}
                 <button
                     type="submit"
                     className={`w-full py-2.5 px-4 rounded-lg shadow-md text-sm font-semibold text-white transition duration-150
@@ -56,12 +70,7 @@ const CreateRoomButton: React.FC = () => {
                 </button>
             </form>
             
-            {/* Mensajes de feedback */}
-            {successId && (
-                <p className="mt-4 text-sm font-medium text-green-600">
-                    ¡Sala con ID #{successId} creada!
-                </p>
-            )}
+            {/* Mensaje de error (Mantenido) */}
             {error && (
                 <p className="mt-4 text-sm font-medium text-red-600">
                     Error al crear la sala: {error}
