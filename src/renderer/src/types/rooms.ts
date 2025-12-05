@@ -16,3 +16,15 @@ export interface UpdateChatRoomDto {
     chatRoomName: string | null;
 }
 //#endregion
+
+// Tipo para la función que el hook usará para recargar la lista
+export type FetchRoomsFunction = () => Promise<void>;
+
+// Tipo para el valor de retorno del hook useFetchUserRooms
+export interface UseFetchUserRoomsResult {
+    rooms: ChatRoomDto[];
+    isLoading: boolean;
+    error: string | null;
+    fetchRooms: FetchRoomsFunction; // ⬅️ ¡Aquí definimos fetchRooms!
+    addRoom: (newRoom: ChatRoomDto) => void;
+}

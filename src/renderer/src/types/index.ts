@@ -13,4 +13,9 @@ export * from './response';
 //#region Exportacion de tipos rooms
 export * from './rooms';
 //#endregion
+//#region Exportacion de tipos auth
+export * from './auth';
 
+//#region Exportacion de tipos chat
+export * from './chat';
+//#endregion   

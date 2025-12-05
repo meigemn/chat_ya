@@ -49,7 +49,7 @@ const ChatRoom: React.FC = () => {
                 chatName={chatName}
                 messages={adaptedMessages}
                 onSendMessage={handleSendMessage}
-                isSending={!isConnected} // Deshabilitar el input si no hay conexión
+                isSendingDisabled={!isConnected} // Deshabilitar el input si no hay conexión
             />
         </div>
     );

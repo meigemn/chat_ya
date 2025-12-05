@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ChatRoomDto } from '@renderer/types'; // Asumimos que la ruta es correcta
-import { authenticatedFetch } from './UseRoomActions'; // Importar la función de fetch autenticado
+import { authenticatedFetch } from './useRoomActions'; // Importar la función de fetch autenticado
 
 export const useFetchUserRooms = () => {
     const [rooms, setRooms] = useState<ChatRoomDto[]>([]);

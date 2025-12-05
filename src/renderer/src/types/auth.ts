@@ -10,44 +10,45 @@ export interface ILoginRequest {
     password: string;
 }
 
-/**
- * 2. DTO de Usuario (Información básica del usuario)
- * ------------------------------------------------
- * Corresponde a 'UserDto' en tu API de C#.
- */
+//#region Dto de usuario (UserDto)
 export interface IUserDto {
     id: string;
     userName: string;
 }
+//#endregion
 
-/**
- * 3. Respuesta de Login (Respuesta exitosa del backend)
- * -----------------------------------------------------
- * Corresponde a 'LoginResponseDto' en tu API de C#.
- */
+//#region respuesta del login (LoginResponseDto)
 export interface ILoginResponse {
-    token: string;       // El JSON Web Token (JWT)
+    token: string;       // Token (JWT)
     user: IUserDto;
-    expiration: string;  // Fecha y hora de expiración del token (ISO 8601 string)
+    expiration: string;  //expiración del token
 }
-
-/**
- * 4. DTO de Error Genérico
- * ------------------------
- * Corresponde a 'GenericErrorDto' en tu API de C# para respuestas 400/401.
- */
+//#endregion
+//#region Error Generico
 export interface IGenericError {
-    message: string; // Mensaje de error (e.g., "Credenciales inválidas.")
-    code: string;    // Código interno (e.g., "Auth.Login")
+    message: string; 
+    code: string;    
 }
+//#endregion
+
+//#region interfaz User
+export interface User {
+    id: string;
+    email: string;
+    userName: string;
+}
+//#endregion
+
+//#region AuthState y AuthContextType
 
 export interface AuthState {
     token: string | null;
-    user: Object | null;
+    user: User | null; 
 }
 
 export interface AuthContextType extends AuthState {
-    login: (authData: { token: string; user: Object }) => void;
+    login: (authData: { token: string; user: User }) => void; 
     logout: () => void;
     isAuthenticated: boolean;
 }
+//#endregion

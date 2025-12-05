@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom'; 
+import { useAuth } from '../../hooks/useAuth'; 
+// Importamos 'User' directamente para construir el objeto completo
+import { ILoginRequest, ILoginResponse, IGenericError, User } from '@renderer/types/auth'; 
 
-
-import { ILoginRequest, ILoginResponse, IGenericError } from '@renderer/types/auth'; 
-
-//  Define la URL base de API de .NET
+// Define la URL base de API de .NET (Usando la del usuario: 7201)
 const API_BASE_URL = 'https://localhost:7201'; 
 
 // Componente SVG para el icono de "Mostrar Contraseña" (Ojo abierto)
@@ -51,8 +51,10 @@ const EyeSlashIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function Login() {
-    // 1. HOOK DE NAVEGACIÓN
+    // 1. HOOKS DE NAVEGACIÓN Y AUTENTICACIÓN
     const navigate = useNavigate(); 
+    // 🔑 Obtener el estado y la función 'login' del contexto
+    const { login, isAuthenticated } = useAuth(); 
 
     // 2. ESTADOS DEL FORMULARIO Y VISIBILIDAD
     const [email, setEmail] = useState<string>('');
@@ -67,10 +69,23 @@ export default function Login() {
         setShowPassword(!showPassword);
     };
 
-    // 4. MANEJADOR DEL SUBMIT (LÓGICA DE CONEXIÓN A LA API)
+    // 🔑 4. LÓGICA DE REDIRECCIÓN BASADA EN EL CONTEXTO
+    useEffect(() => {
+        if (isAuthenticated) {
+            // Si isAuthenticated es true, redirigimos a lobby
+            console.log("Autenticación detectada en el contexto. Redirigiendo a /lobby.");
+            navigate('/lobby', { replace: true });
+        } else {
+            // Añadido log para ayudar a diagnosticar problemas de logout
+            console.log("Usuario NO autenticado. Mostrando formulario de Login.");
+        }
+    }, [isAuthenticated, navigate]); 
+
+
+    // 5. MANEJADOR DEL SUBMIT (LÓGICA DE CONEXIÓN A LA API)
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(null); // Limpiar errores previos
+        setError(null); 
         setIsLoading(true);
 
         const loginData: ILoginRequest = { email, password };
@@ -83,32 +98,29 @@ export default function Login() {
             );
 
             // RESPUESTA EXITOSA (Status 200 OK)
-            const { token, user } = response.data;
+            const { token, user: userDto } = response.data;
             
-            // GUARDAR EL TOKEN JWT Y LA INFO DEL USUARIO
-            // Usamos localStorage. En una app de producción, considera un método más seguro (como cookies)
-            localStorage.setItem('authToken', token);
-            localStorage.setItem('currentUser', JSON.stringify(user));
+            // ✅ CORRECCIÓN: Construir el objeto 'User' completo 
+            // usando los datos del DTO (id, userName) y el email del estado local.
+            const authenticatedUser: User = {
+                id: userDto.id,
+                email: email, // <--- Aquí se añade la propiedad faltante
+                userName: userDto.userName,
+            };
 
-            // Notificación de éxito (se reemplaza 'alert' por 'console.log' para no bloquear)
-            console.log(`Login exitoso. ¡Bienvenido, ${user.userName}! Redirigiendo a /lobby.`);
-            
-            // Redirigir al usuario
-            navigate('/lobby'); 
+            // Ahora llamamos a 'login' con el objeto 'User' completo.
+            login({ token, user: authenticatedUser }); 
             
         } catch (err) {
             // MANEJO DE ERRORES (400, 401, 500, etc.)
             const axiosError = err as AxiosError<IGenericError>;
             
             if (axiosError.response) {
-                // Error capturado del backend (ej: Credenciales inválidas)
                 const backendError = axiosError.response.data;
                 setError(backendError.message || 'Error desconocido del servidor.');
             } else if (axiosError.request) {
-                // Error de red (No se pudo llegar al servidor)
                 setError('Error de red: No se pudo conectar con la API. Verifica que el backend esté corriendo.');
             } else {
-                // Otros errores
                 setError('Ha ocurrido un error inesperado al procesar la solicitud.');
             }
             
@@ -117,10 +129,14 @@ export default function Login() {
         }
     };
 
-    // 5. ESTRUCTURA Y UI DEL FORMULARIO
+    // 6. ESTRUCTURA Y UI DEL FORMULARIO
+    if (isAuthenticated) {
+        return <div className="text-center text-lg text-gray-500">Iniciando sesión...</div>;
+    }
+
     return (
-        <div className="flex items-center justify-center  ">
-            <div className="w-full max-w-md p-8 space-y-6  rounded-xl shadow-xl border border-gray-200">
+        <div className="flex items-center justify-center  ">
+            <div className="w-full max-w-md p-8 space-y-6  rounded-xl shadow-xl border border-gray-200">
                 <h2 className="text-center text-3xl font-extrabold text-white-900">
                     Iniciar Sesión
                 </h2>
@@ -134,7 +150,6 @@ export default function Login() {
                     </ul>
                 </div>
 
-                {/* Asignamos el manejador de envío al formulario */}
                 <form className="space-y-4" onSubmit={handleSubmit}>
 
                     {/* Campo de Email */}
@@ -146,12 +161,12 @@ export default function Login() {
                             Email
                         </label>
                         <input
-                            type="email" // Importante: usar type="email"
+                            type="email" 
                             id="email"
                             name="email"
                             required
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)} // Captura el valor
+                            onChange={(e) => setEmail(e.target.value)} 
                             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm "
                             placeholder="correo@ejemplo.com"
                             disabled={isLoading}
@@ -167,22 +182,19 @@ export default function Login() {
                             Contraseña
                         </label>
 
-                        {/* Contenedor relativo para posicionar el input y el icono */}
                         <div className="relative mt-1">
                             <input
-                                // estado para determinar si el tipo es 'text' o 'password'
                                 type={showPassword ? 'text' : 'password'}
                                 id="password"
                                 name="password"
                                 required
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)} // Captura el valor
+                                onChange={(e) => setPassword(e.target.value)} 
                                 className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm pr-10"
                                 placeholder="Mínimo 8 caracteres"
                                 disabled={isLoading}
                             />
 
-                            {/* ojo (botón de visibilidad) */}
                             <button
                                 type="button" 
                                 onClick={togglePasswordVisibility}
@@ -191,9 +203,9 @@ export default function Login() {
                                 disabled={isLoading}
                             >
                                 {showPassword ? (
-                                    <EyeSlashIcon /> // Uso de SVG incrustado
+                                    <EyeSlashIcon />
                                 ) : (
-                                    <EyeIcon /> // Uso de SVG incrustado
+                                    <EyeIcon />
                                 )}
                             </button>
                         </div>
@@ -212,7 +224,7 @@ export default function Login() {
                         <button
                             type="submit"
                             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                            disabled={isLoading} // Deshabilitar si está cargando
+                            disabled={isLoading} 
                         >
                             {isLoading ? (
                                 <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

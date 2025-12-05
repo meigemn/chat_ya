@@ -11,7 +11,7 @@ interface ChatMessage {
 }
 
 // URL del hub de SignalR (AJUSTA ESTA URL)
-const HUB_URL = 'http://localhost:5000/chatHub';
+const HUB_URL = 'http://localhost:7201/chatHub';
 
 export const useChatConnection = (roomId: number) => {
     const [connection, setConnection] = useState<signalR.HubConnection | null>(null);

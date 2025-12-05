@@ -13,7 +13,7 @@ export const MessageList: React.FC<MessageListProps> = ({ messages,currentUserNa
                 </p>
             ) : (
                 messages.map((message) => {
-                    // 🔑 LÓGICA CLAVE: Calcular si el mensaje es del usuario actual
+                    // Calcula si el mensaje es del usuario actual.
                     const isCurrentUser = message.sender === currentUserName;
 
                     // El componente MessageItem necesita la lógica 'me' | 'other'

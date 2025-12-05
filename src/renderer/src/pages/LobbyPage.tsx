@@ -1,28 +1,28 @@
-// Frontend/pages/LobbyPage.tsx
-import React from 'react';
+// Frontend/pages/LobbyPage.tsx (CÓDIGO FINAL CORREGIDO)
+import React, { useEffect } from 'react';
+// 🔑 Ya no necesitamos useLocation porque la lógica de fallback está en App.tsx
+import { Outlet } from 'react-router-dom'; 
 import { LobbyLayout } from '@renderer/components/Lobby/LobbyLayout';
-import CreateRoomButton from '@renderer/components/Lobby/CreateRoomButton';  
 import ChatList from '@renderer/components/Lobby/ChatList';
-import LogoutButton from '@renderer/components/Lobby/LogoutButton';
-import { useFetchUserRooms } from '@renderer/hooks/useFetchUserRoom';
-import { ChatRoomDto } from '@renderer/types';
+import { useFetchUserRooms } from '@renderer/hooks/useRoomActions';
+import { ChatRoomDto } from '@renderer/types/rooms'; 
+
 
 const LobbyPage: React.FC = () => {
     // 1. Obtener el estado y la función para añadir salas del hook
-    const { rooms, isLoading, error, addRoom } = useFetchUserRooms(); 
+    const { rooms, isLoading, error, addRoom, fetchRooms } = useFetchUserRooms();
+
+    // 🔑 Cargar salas al montar el componente
+    useEffect(() => {
+        fetchRooms();
+    }, [fetchRooms]);
 
     // 2. Definir el contenido de la columna izquierda (chatList)
     const chatListContent = (
         <>
-            {/* Sección de Botones (Logout y Creación) */}
-            <div className="p-4 bg-white shadow-lg rounded-lg mb-4 space-y-4">
-                <LogoutButton />
-                {/* 🔑 Conexión Clave: Pasamos la función 'addRoom' al botón de creación */}
-                <CreateRoomButton onRoomCreated={addRoom} />
-            </div>
-            
             {/* Lista de Salas */}
-            <div className="flex-1 min-h-0">
+            {/* NOTA: Si quisieras que ChatList siempre ocupe el espacio sin scroll, deberías ajustar el layout aquí */}
+            <div className="flex-1 min-h-0"> 
                 <ChatList 
                     rooms={rooms} 
                     isLoading={isLoading} 
@@ -32,19 +32,18 @@ const LobbyPage: React.FC = () => {
         </>
     );
 
-    // 3. Definir el área de chat por defecto
-    const defaultChatArea = (
-        <div className="h-full flex items-center justify-center bg-white rounded-lg shadow-lg">
-            <p className="text-gray-500 text-lg">
-                👋 Selecciona una sala de chat de la izquierda o crea una nueva.
-            </p>
-        </div>
+    // 3. 🔑 SOLUCIÓN: El área de chat es simplemente el Outlet.
+    // El router (App.tsx) se encarga de decidir si Outlet renderiza ChatRoom o DefaultChatArea.
+    const chatAreaContent = (
+        <Outlet /> 
     );
 
     return (
-        <LobbyLayout
-            chatList={chatListContent}
-            chatArea={defaultChatArea}
+        <LobbyLayout 
+            chatList={chatListContent} 
+            chatArea={chatAreaContent} 
+            // Pasamos la función requerida al LobbyLayout para que este la pase al CreateRoomButton
+            onRoomCreated={addRoom} 
         />
     );
 };

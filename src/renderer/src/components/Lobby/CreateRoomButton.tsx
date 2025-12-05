@@ -1,7 +1,7 @@
 // Frontend/components/CreateRoomButton.tsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // 👈 Importar para navegación
-import { useCreateRoom } from '../../hooks/UseRoomActions'; 
+import { useNavigate } from 'react-router-dom';
+import { useCreateRoom } from '../../hooks/useRoomActions'; 
 import { ChatRoomDto } from '@renderer/types';
 
 // Definir la prop que el componente padre usará para actualizar la lista

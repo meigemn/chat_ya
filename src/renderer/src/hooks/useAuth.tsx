@@ -1,21 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { AuthContextType } from '@renderer/types/auth';
-import { AuthState } from '@renderer/types/auth';
-// -----------------------------------------------------
-// 1. DEFINICIÓN DE TIPOS (Ajusta ILoginResponse según tu necesidad)
-// -----------------------------------------------------
+import { AuthContextType, AuthState, User } from '@renderer/types/auth'; 
 
-// Asegúrate de que ILoginResponse y User coincidan con los tipos de tu login.tsx
-interface User {
-    id: string;
-    email: string;
-    userName: string; 
-}
-
-
-// -----------------------------------------------------
 // 2. CONTEXTO Y PROVIDER
-// -----------------------------------------------------
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -23,21 +9,21 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
-// 🔑 CAMBIO CLAVE 1: Eliminamos 'export const' aquí
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [state, setState] = useState<AuthState>({
         token: null,
         user: null,
     });
 
-    // 🔑 useEffect para cargar el estado inicial de localStorage
+    // Carga el estado inicial de localStorage
     useEffect(() => {
         const token = localStorage.getItem('authToken');
         const userJson = localStorage.getItem('currentUser');
         
         if (token && userJson) {
             try {
-                const user = JSON.parse(userJson) as User;
+                // Casting a la interfaz importada
+                const user = JSON.parse(userJson) as User; 
                 setState({ token, user });
             } catch (e) {
                 console.error("Error al parsear el usuario de localStorage:", e);
@@ -90,5 +76,4 @@ export const useAuth = () => {
     return context;
 };
 
-// 🔑 CAMBIO CLAVE 2: Exportamos AuthProvider por defecto
 export default AuthProvider;

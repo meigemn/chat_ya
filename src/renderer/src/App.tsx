@@ -1,24 +1,27 @@
+// App.tsx (CÓDIGO CORREGIDO Y COMPLETO)
+
 import { Routes, Route, useNavigate, Navigate, Outlet } from 'react-router-dom';
 import React from 'react';
 import LobbyPage from './pages/LobbyPage'; 
 import Login from './components/Login/Login' 
 import ChatRoom from '@renderer/pages/ChatRoom';
-import { LobbyLayout } from './components/Lobby/LobbyLayout';
+// Importamos useAuth para usar el estado de autenticación global
+import { useAuth } from './hooks/useAuth'; 
 
 // --- COMPONENTE DE PROTECCIÓN DE RUTA ---
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // Implementación simple: verifica la existencia de un token
-    const isAuthenticated = localStorage.getItem('authToken'); 
+    // 🔑 USAMOS EL ESTADO GLOBAL DE AUTENTICACIÓN
+    const { isAuthenticated } = useAuth(); 
     
     if (!isAuthenticated) {
         // Redirigir al Login si no está autenticado
+        // 🚨 Importante: Redirigimos a la raíz, que es donde se renderiza el Login
         return <Navigate to="/" replace />; 
     }
     return <>{children}</>;
 };
 
 // --- COMPONENTE HOME (Ahora es la página de bienvenida/login) ---
-// Mantenemos la estructura de tu componente Home original
 function Home() {
     return (
         <div className='flex h-screen items-center justify-center'>
@@ -56,16 +59,19 @@ const DefaultChatArea: React.FC = () => (
 );
 
 
-// --- APP PRINCIPAL CON LAS NUEVAS RUTAS ---
+// --- APP PRINCIPAL CON LAS RUTAS ---
 function App(): React.JSX.Element {
+    // 🔑 Leemos el estado de autenticación global
+    const { isAuthenticated } = useAuth();
+
     return (
         <Routes>
             {/* 1. Ruta de Login/Bienvenida (/) */}
-            {/* Si ya hay token, redirigimos directamente a /lobby */}
+            {/* 🔑 USAMOS EL ESTADO DEL CONTEXTO: Si está autenticado, redirige. Si no, muestra Login. */}
             <Route 
                 path="/" 
                 element={
-                    localStorage.getItem('authToken') 
+                    isAuthenticated 
                         ? <Navigate to="/lobby" replace /> 
                         : <Home />
                 } 

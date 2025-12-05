@@ -1,107 +1,76 @@
-import { useState } from 'react';
-// Asegúrate de que las rutas de importación de tus DTOs sean correctas (ej. '../types/room')
-import { CreateRoomDto, ChatRoomDto } from '../types'; 
+import { useState, useCallback } from 'react';
+import apiClient from '../api/apiClient';
+import { ChatRoomDto, UseFetchUserRoomsResult } from '../types/rooms';
+import { AxiosError } from 'axios';
+import { CreateRoomDto } from '@renderer/types';
 
-// URL base de tu API de .NET (AJUSTA ESTA URL si tu backend no corre en 5000 o si la url es diferente)
-const API_BASE_URL = 'http://localhost:5000'; 
+// 1. Hook para Listar y Gestionar Salas 
+export const useFetchUserRooms = (): UseFetchUserRoomsResult => {
+    const [rooms, setRooms] = useState<ChatRoomDto[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-// --- Función de fetch autenticado ---
-export async function authenticatedFetch<T>(endpoint: string, options: RequestInit): Promise<T> {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-        throw new Error('Usuario no autenticado. Inicia sesión para continuar.');
-    }
+    // Función para obtener las salas del usuario (GET /api/rooms)
+    const fetchRooms = useCallback(async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await apiClient.get<ChatRoomDto[]>('/rooms');
+            setRooms(response.data);
+        } catch (err) {
+            const axiosError = err as AxiosError<{ error?: string }>;
+            console.error("Error al cargar salas:", axiosError);
 
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        ...options.headers
-    };
+            // Intenta obtener el mensaje de error del cuerpo de la respuesta del servidor (si existe),
+            // si no, usa el mensaje de error de Axios, o uno genérico.
+            const errorMessage = axiosError.response?.data?.error
+                || axiosError.message
+                || "Error desconocido al cargar las salas.";
 
-    const url = `${API_BASE_URL}${endpoint}`;
-    
-    // Ejecutar la petición
-    const response = await fetch(url, { ...options, headers });
-    
-    // Manejo de respuesta: Intentar leer el cuerpo si no es 204 No Content
-    const isJson = response.headers.get('content-type')?.includes('application/json');
-    const responseBody = isJson && response.status !== 204 ? await response.json() : null;
-
-    if (response.ok) {
-        // Respuesta exitosa (200, 201, 202, etc.)
-        return responseBody as T; 
-    }
-    
-    // Si la respuesta no es 2xx, lanza un error basado en el cuerpo del error
-    
-    if (response.status === 401 || response.status === 403) {
-        // Error de autenticación o autorización
-        throw new Error('No tienes permiso para realizar esta acción. Token inválido o expirado.');
-    }
-
-    // Manejo de errores de la API (ej. 400 Bad Request)
-    if (responseBody) {
-        // 1. Si la API devuelve un array de errores (ej. { errors: [...] })
-        if (responseBody.errors && Array.isArray(responseBody.errors)) {
-            throw new Error(responseBody.errors.join('; '));
+            setError(errorMessage);
+        } finally {
+            setIsLoading(false);
         }
-        
-        // 2. Si la API devuelve un error genérico con una descripción (GenericErrorDto)
-        if (responseBody.description) {
-            throw new Error(responseBody.description);
-        }
+    }, []);
 
-        // 3. Si la API devuelve un error simple (ej. el que pusiste en el C#: { Error = "..." })
-        if (responseBody.error) {
-            throw new Error(responseBody.error);
-        }
-    }
+    // Función para añadir una sala localmente después de la creación
+    const addRoom = useCallback((newRoom: ChatRoomDto) => {
+        setRooms(prevRooms => [...prevRooms, newRoom]);
+    }, []);
 
-    // Error HTTP desconocido
-    throw new Error(`Error desconocido: ${response.status} ${response.statusText}`);
-}
-// --- FIN DE LA FUNCIÓN DE FETCH ---
+    // El hook devuelve explícitamente todos los miembros del tipo UseFetchUserRoomsResult
+    return { rooms, isLoading, error, fetchRooms, addRoom };
+};
 
+
+// HOOK 2: Para crear una nueva sala (Usado en CreateRoomButton)
 
 export const useCreateRoom = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const createRoom = async (roomData: CreateRoomDto): Promise<ChatRoomDto | null> => {
+    const createRoom = useCallback(async (roomData: CreateRoomDto): Promise<ChatRoomDto | null> => {
         setIsLoading(true);
         setError(null);
-        
         try {
-            // El endpoint es POST /api/rooms
-            // El backend devuelve ChatRoomDto (Status 201 Created)
-            const newRoom: ChatRoomDto = await authenticatedFetch<ChatRoomDto>('/api/rooms', {
-                method: 'POST',
-                body: JSON.stringify(roomData),
-            });
-            
-            // Si llegamos aquí, el fetch fue exitoso (código 201)
-            //newRoom tiene de valor el cuerpo JSON que la API devuelve
-            /*
-                *newRoom: verifica que la respuesta Json no sea null o undefined
-                *newRoom.is: Verifica que el objeto newRoom tenga la propiedad id
-            */
-            if (newRoom && newRoom.id) {
-                setIsLoading(false);
-                // Devolvemos el ID para que el componente CreateRoomButton pueda navegar
-                return newRoom; 
-            } else {
-                setError('Respuesta exitosa, pero el ID de la sala no se encontró. Revise el DTO de respuesta.');
-                setIsLoading(false);
-                return null;
-            }
+            // Llama a POST /api/rooms
+            const response = await apiClient.post<ChatRoomDto>('/rooms', roomData);
 
-        } catch (err: any) {
-            // El error es la excepción lanzada por authenticatedFetch
-            setError(err.message || 'Fallo en la conexión o en la API.');
-            setIsLoading(false);
+            return response.data; // Devuelve el DTO de la nueva sala
+        } catch (err) {
+            const axiosError = err as AxiosError<{ error?: string }>;
+            console.error("Error al crear sala:", axiosError);
+
+            const errorMessage = axiosError.response?.data?.error
+                || axiosError.message
+                || "Error desconocido al crear sala.";
+
+            setError(errorMessage);
             return null;
+        } finally {
+            setIsLoading(false);
         }
-    };
+    }, []);
 
-    return { createRoom,isLoading, error };
+    return { createRoom, isLoading, error };
 };
