@@ -1,4 +1,3 @@
-// Frontend/components/CreateRoomButton.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCreateRoom } from '../../hooks/useRoomActions'; 

@@ -64,9 +64,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     );
 };
 
-// -----------------------------------------------------
 // 3. HOOK DE CONSUMO PERSONALIZADO
-// -----------------------------------------------------
 
 export const useAuth = () => {
     const context = useContext(AuthContext);

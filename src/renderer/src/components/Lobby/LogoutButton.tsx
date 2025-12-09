@@ -1,5 +1,6 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+// 🔑 Importamos useAuth para acceder a la función logout()
+import { useAuth } from '../../hooks/useAuth'; 
 
 const LogOutIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg 
@@ -22,24 +23,17 @@ const LogOutIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export default function LogoutButton() {
-    const navigate = useNavigate();
+    // Obtenemos la función logout del contexto
+    const { logout } = useAuth();
     
     // Función para manejar el cierre de sesión
     const handleLogout = () => {
-        // 1. Limpiar el almacenamiento local (eliminar el token y la info del usuario)
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('currentUser');
-        
-        // Opcional: limpiar cualquier otro estado global si estás usando Context/Redux
-
-        // 2. Redirigir al usuario a la página de login
-        navigate('/');
+        logout(); 
     };
 
     return (
         <button
-            onClick={handleLogout} // Llamar a la función de cierre de sesión
-            // He ajustado ligeramente las clases para incluir el icono y hacerlo más legible
+            onClick={handleLogout} // Llama a la función de cierre de sesión
             className='rounded-md border-2 border-red-500 ml-4 px-4 py-2 text-red-500 hover:bg-red-500 hover:text-white transition h-[7vh] w-[12vw] flex items-center justify-center font-medium'
         >
             <LogOutIcon />

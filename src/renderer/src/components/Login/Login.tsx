@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom'; 
 import { useAuth } from '../../hooks/useAuth'; 
-// Importamos 'User' directamente para construir el objeto completo
 import { ILoginRequest, ILoginResponse, IGenericError, User } from '@renderer/types/auth'; 
 
-// Define la URL base de API de .NET (Usando la del usuario: 7201)
+// ⚠️ Asegúrate de que esta URL es correcta y, si usas el puerto 7201, usa HTTPS.
 const API_BASE_URL = 'https://localhost:7201'; 
 
 // Componente SVG para el icono de "Mostrar Contraseña" (Ojo abierto)
@@ -69,18 +68,8 @@ export default function Login() {
         setShowPassword(!showPassword);
     };
 
-    // 🔑 4. LÓGICA DE REDIRECCIÓN BASADA EN EL CONTEXTO
-    useEffect(() => {
-        if (isAuthenticated) {
-            // Si isAuthenticated es true, redirigimos a lobby
-            console.log("Autenticación detectada en el contexto. Redirigiendo a /lobby.");
-            navigate('/lobby', { replace: true });
-        } else {
-            // Añadido log para ayudar a diagnosticar problemas de logout
-            console.log("Usuario NO autenticado. Mostrando formulario de Login.");
-        }
-    }, [isAuthenticated, navigate]); 
-
+    // 🚨 ELIMINADO: La lógica de redirección por isAuthenticated ya está en App.tsx. 
+    // Mantenerla aquí causaba navegación redundante o conflictos.
 
     // 5. MANEJADOR DEL SUBMIT (LÓGICA DE CONEXIÓN A LA API)
     const handleSubmit = async (e: React.FormEvent) => {
@@ -101,15 +90,17 @@ export default function Login() {
             const { token, user: userDto } = response.data;
             
             // ✅ CORRECCIÓN: Construir el objeto 'User' completo 
-            // usando los datos del DTO (id, userName) y el email del estado local.
             const authenticatedUser: User = {
                 id: userDto.id,
-                email: email, // <--- Aquí se añade la propiedad faltante
+                email: email, // <--- Importante: añadir el email del estado local.
                 userName: userDto.userName,
             };
 
-            // Ahora llamamos a 'login' con el objeto 'User' completo.
+            // Llama a 'login', el cual guarda el token, el usuario y actualiza isAuthenticated a true.
             login({ token, user: authenticatedUser }); 
+            
+            // 💡 IMPORTANTE: Una vez que 'login' se llama y actualiza el contexto, 
+            // App.tsx detectará el cambio y redirigirá a /lobby automáticamente.
             
         } catch (err) {
             // MANEJO DE ERRORES (400, 401, 500, etc.)
@@ -119,7 +110,7 @@ export default function Login() {
                 const backendError = axiosError.response.data;
                 setError(backendError.message || 'Error desconocido del servidor.');
             } else if (axiosError.request) {
-                setError('Error de red: No se pudo conectar con la API. Verifica que el backend esté corriendo.');
+                setError('Error de red: No se pudo conectar con la API. Verifica que el backend esté corriendo y que uses HTTPS en 7201.');
             } else {
                 setError('Ha ocurrido un error inesperado al procesar la solicitud.');
             }
@@ -131,6 +122,7 @@ export default function Login() {
 
     // 6. ESTRUCTURA Y UI DEL FORMULARIO
     if (isAuthenticated) {
+        // Muestra un mensaje temporal mientras App.tsx ejecuta la redirección.
         return <div className="text-center text-lg text-gray-500">Iniciando sesión...</div>;
     }
 

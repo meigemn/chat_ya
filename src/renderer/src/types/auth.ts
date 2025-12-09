@@ -1,9 +1,5 @@
-// auth.ts
-
 /**
  * 1. Petición de Login (Payload enviado al backend)
- * ------------------------------------------------
- * Corresponde a 'LoginRequestDtos' en tu API de C#.
  */
 export interface ILoginRequest {
     email: string;

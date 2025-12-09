@@ -53,7 +53,7 @@ function Home() {
 const DefaultChatArea: React.FC = () => (
     <div className="h-full flex items-center justify-center bg-white rounded-lg shadow-lg">
         <p className="text-gray-500 text-lg">
-            👋 Selecciona una sala de chat de la izquierda o crea una nueva.
+            App.tsx
         </p>
     </div>
 );
