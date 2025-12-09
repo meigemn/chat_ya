@@ -10,7 +10,7 @@ interface ChatMessage {
     timestamp: Date; // Timestamp de la recepción
 }
 // NOTA: Asegúrate de que esta URL sea la correcta para tu backend
-const API_BASE_URL = 'https://192.168.125.226:7201'; 
+const API_BASE_URL = 'https://localhost:7201'; 
 const HUB_URL = `${API_BASE_URL}/chatHub`;
 
 // --- Función Auxiliar para Cargar el Historial ---
