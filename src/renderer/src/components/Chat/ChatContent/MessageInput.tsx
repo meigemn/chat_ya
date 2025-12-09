@@ -13,7 +13,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({ onSend,isDisabled })
 
     return (
         <div className="p-4 bg-white border-t border-gray-300">
-            <div className="flex gap-2">
+            <div className="flex gap-2 text-black">
                 <input
                     type="text"
                     value={newMessage}
