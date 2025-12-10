@@ -1,22 +1,28 @@
 import React, { useState } from 'react';
-// CAMBIA a importación nombrada
 import { LobbyLayout } from '../components/Lobby/LobbyLayout';
-import ChatContent, { Message } from '../components/Chat/ChatContent/Index';
+import ChatContent from '../components/Chat/ChatContent/Index';
 import ChatList from '../components/Lobby/ChatList';
-import CreateChatButton from '@renderer/components/Lobby/CreateRoomButton';
-
-// Mock data
-const mockChats = [
-    { id: '1', name: 'Grupo Desarrollo', lastMessage: 'Último mensaje' },
-    { id: '2', name: 'Sala General', lastMessage: 'Hola a todos' }
-];
+import { Message } from '@renderer/types/chat';
+// Asegúrate de que esta línea importa correctamente ChatRoomDto
+import { ChatRoomDto } from '@renderer/types'; 
+import { useFetchUserRooms } from '../hooks/useRoomActions';
 
 const MOCK_CHAT_NAME = "Grupo de Desarrolladores";
 
 const Lobby: React.FC = () => {
+    // 🚨 1. LLAMADA AL HOOK DENTRO DEL COMPONENTE
+    const { rooms, addRoom, isLoading, error } = useFetchUserRooms(); 
+    
     const [messages, setMessages] = useState<Message[]>([]);
     const [nextId, setNextId] = useState(1);
-
+    
+    // 🚨 2. CORRECCIÓN: Usar 'chatRoomName' en lugar de 'name'
+    const handleRoomCreation = (newRoom: ChatRoomDto) => {
+        // Llama a la función del hook para actualizar el estado local de salas
+        addRoom(newRoom); 
+        console.log(`Nueva sala ${newRoom.chatRoomName} añadida localmente.`);
+    };
+    
     const handleSendMessage = (text: string) => {
         const newMessage: Message = {
             id: nextId.toString(),
@@ -28,16 +34,21 @@ const Lobby: React.FC = () => {
         setNextId(prev => prev + 1);
     };
 
-    const handleSelectChat = (id: string) => {
-        console.log('Chat seleccionado:', id);
-    };
+    
 
     return (
         <>
             <LobbyLayout
-                chatList={<ChatList chats={mockChats} onSelectChat={handleSelectChat} />}
+                onRoomCreated={handleRoomCreation} 
+                chatList={
+                    <ChatList 
+                        rooms={rooms} 
+                        isLoading={isLoading} 
+                        error={error} 
+                    />
+                }
+                
                 chatArea={
-
                     <ChatContent
                         chatName={MOCK_CHAT_NAME}
                         messages={messages}

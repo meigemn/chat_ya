@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ChatRoomDto } from '@renderer/types'; // Asumimos que la ruta es correcta
-import { authenticatedFetch } from './useRoomActions'; // Importar la función de fetch autenticado
-
+import { ChatRoomDto } from '@renderer/types'; 
+import apiClient from '@renderer/api/apiClient'; // Importar la función de fetch autenticado
 export const useFetchUserRooms = () => {
     const [rooms, setRooms] = useState<ChatRoomDto[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -12,10 +11,9 @@ export const useFetchUserRooms = () => {
         setIsLoading(true);
         setError(null);
         try {
-            // Llama al endpoint GET /api/rooms
-            const roomsList: ChatRoomDto[] = await authenticatedFetch<ChatRoomDto[]>('/api/rooms', {
-                method: 'GET',
-            });
+            const response = await apiClient.get<ChatRoomDto[]>('/rooms');
+            const roomsList: ChatRoomDto[] = response.data
+            
             setRooms(roomsList.reverse()); // Invertir para que la última creada esté arriba
         } catch (err: any) {
             setError(err.message || 'Fallo al cargar la lista de salas.');

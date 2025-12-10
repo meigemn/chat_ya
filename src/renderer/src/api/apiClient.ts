@@ -1,8 +1,5 @@
 // src/api/apiClient.ts
 import axios from 'axios';
-
-// ⚠️ IMPORTANTE: Ajusta esta URL si tu backend no usa el puerto 5000.
-// Debe ser la misma URL base que usas en tus peticiones de login.
 const BASE_URL = 'https://localhost:7201/api'; 
 
 const apiClient = axios.create({

@@ -3,7 +3,6 @@ import { ChatHeader } from './ChatHeader';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
 import { ChatContentProps } from '@renderer/types/chat';
-import { Message } from '@renderer/types/chat';
 import { useAuth } from '@renderer/hooks/useAuth';
 
 /**

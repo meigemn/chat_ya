@@ -1,6 +1,6 @@
 // App.tsx (CÓDIGO CORREGIDO Y COMPLETO)
 
-import { Routes, Route, useNavigate, Navigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import React from 'react';
 import LobbyPage from './pages/LobbyPage'; 
 import Login from './components/Login/Login' 

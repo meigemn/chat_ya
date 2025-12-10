@@ -5,7 +5,6 @@ import { Outlet } from 'react-router-dom';
 import { LobbyLayout } from '@renderer/components/Lobby/LobbyLayout';
 import ChatList from '@renderer/components/Lobby/ChatList';
 import { useFetchUserRooms } from '@renderer/hooks/useRoomActions';
-import { ChatRoomDto } from '@renderer/types/rooms'; 
 
 
 const LobbyPage: React.FC = () => {

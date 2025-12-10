@@ -1,4 +1,3 @@
-// Frontend/hooks/useChatConnection.ts
 import { useState, useEffect, useCallback } from 'react';
 import * as signalR from '@microsoft/signalr';
 

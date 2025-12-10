@@ -1,4 +1,4 @@
-//#region Imports
+//#region export Message
 export interface Message {
     id: string;
     text: string;

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
-import { useNavigate } from 'react-router-dom'; 
+//import { useNavigate } from 'react-router-dom'; 
 import { useAuth } from '../../hooks/useAuth'; 
 import { ILoginRequest, ILoginResponse, IGenericError, User } from '@renderer/types/auth'; 
 
-// ⚠️ Asegúrate de que esta URL es correcta y, si usas el puerto 7201, usa HTTPS.
 const API_BASE_URL = 'https://localhost:7201'; 
 
 // Componente SVG para el icono de "Mostrar Contraseña" (Ojo abierto)
@@ -51,7 +50,7 @@ const EyeSlashIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function Login() {
     // 1. HOOKS DE NAVEGACIÓN Y AUTENTICACIÓN
-    const navigate = useNavigate(); 
+    //const navigate = useNavigate(); 
     // 🔑 Obtener el estado y la función 'login' del contexto
     const { login, isAuthenticated } = useAuth(); 
 

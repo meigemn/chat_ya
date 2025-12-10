@@ -25,6 +25,6 @@ export interface UseFetchUserRoomsResult {
     rooms: ChatRoomDto[];
     isLoading: boolean;
     error: string | null;
-    fetchRooms: FetchRoomsFunction; // ⬅️ ¡Aquí definimos fetchRooms!
+    fetchRooms: FetchRoomsFunction; 
     addRoom: (newRoom: ChatRoomDto) => void;
 }
