@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
-//import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom'; 
 import { useAuth } from '../../hooks/useAuth'; 
 import { ILoginRequest, ILoginResponse, IGenericError, User } from '@renderer/types/auth'; 
 
@@ -50,10 +50,9 @@ const EyeSlashIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function Login() {
     // 1. HOOKS DE NAVEGACIÓN Y AUTENTICACIÓN
-    //const navigate = useNavigate(); 
-    // 🔑 Obtener el estado y la función 'login' del contexto
+    //  Obtener el estado y la función 'login' del contexto
     const { login, isAuthenticated } = useAuth(); 
-
+    const navigate = useNavigate();
     // 2. ESTADOS DEL FORMULARIO Y VISIBILIDAD
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -66,9 +65,6 @@ export default function Login() {
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
-
-    // 🚨 ELIMINADO: La lógica de redirección por isAuthenticated ya está en App.tsx. 
-    // Mantenerla aquí causaba navegación redundante o conflictos.
 
     // 5. MANEJADOR DEL SUBMIT (LÓGICA DE CONEXIÓN A LA API)
     const handleSubmit = async (e: React.FormEvent) => {
@@ -85,22 +81,22 @@ export default function Login() {
                 loginData
             );
 
-            // RESPUESTA EXITOSA (Status 200 OK)
+            
             const { token, user: userDto } = response.data;
             
-            // ✅ CORRECCIÓN: Construir el objeto 'User' completo 
+            // Construir el objeto 'User' completo 
             const authenticatedUser: User = {
                 id: userDto.id,
-                email: email, // <--- Importante: añadir el email del estado local.
+                email: email,
                 userName: userDto.userName,
             };
 
             // Llama a 'login', el cual guarda el token, el usuario y actualiza isAuthenticated a true.
             login({ token, user: authenticatedUser }); 
             
-            // 💡 IMPORTANTE: Una vez que 'login' se llama y actualiza el contexto, 
+            // Una vez que 'login' se llama y actualiza el contexto, 
             // App.tsx detectará el cambio y redirigirá a /lobby automáticamente.
-            
+            navigate('/lobby', { replace: true });
         } catch (err) {
             // MANEJO DE ERRORES (400, 401, 500, etc.)
             const axiosError = err as AxiosError<IGenericError>;
