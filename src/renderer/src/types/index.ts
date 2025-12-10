@@ -1,4 +1,4 @@
-//#region Esportacion tipos mensajes
+//#region Exportacion tipos mensajes
 export * from './messages';
 //#endregion
 

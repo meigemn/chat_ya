@@ -1,58 +1,132 @@
-import React, { useState } from 'react';
+// Frontend/pages/Lobby.tsx
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LobbyLayout } from '../components/Lobby/LobbyLayout';
 import ChatContent from '../components/Chat/ChatContent/Index';
 import ChatList from '../components/Lobby/ChatList';
-import { Message } from '@renderer/types/chat';
-// Asegúrate de que esta línea importa correctamente ChatRoomDto
-import { ChatRoomDto } from '@renderer/types'; 
-import { useFetchUserRooms } from '../hooks/useRoomActions';
+import { Message } from '@renderer/types/chat'; 
+import { ChatRoomDto, CreateRoomDto } from '@renderer/types'; 
+import { useFetchUserRooms, useCreateRoom } from '../hooks/useRoomActions'; 
 
+// El tipo que LobbyLayout espera (ChatRoomDto), aunque solo recibirá el nombre (string) del formulario.
+type OnRoomCreatedHandler = (newRoom: ChatRoomDto) => void;
+
+// Nombre de sala por defecto
 const MOCK_CHAT_NAME = "Grupo de Desarrolladores";
 
 const Lobby: React.FC = () => {
-    // 🚨 1. LLAMADA AL HOOK DENTRO DEL COMPONENTE
-    const { rooms, addRoom, isLoading, error } = useFetchUserRooms(); 
-    
+    const navigate = useNavigate();
+
+    // --- LÓGICA DE SALAS Y API ---
+    const { rooms, addRoom, isLoading, error, fetchRooms } = useFetchUserRooms(); 
+    const { createRoom, isLoading: isCreating } = useCreateRoom();
+
+    // --- LÓGICA DE CHAT Y ESTADO LOCAL ---
     const [messages, setMessages] = useState<Message[]>([]);
     const [nextId, setNextId] = useState(1);
-    
-    // 🚨 2. CORRECCIÓN: Usar 'chatRoomName' en lugar de 'name'
-    const handleRoomCreation = (newRoom: ChatRoomDto) => {
-        // Llama a la función del hook para actualizar el estado local de salas
-        addRoom(newRoom); 
-        console.log(`Nueva sala ${newRoom.chatRoomName} añadida localmente.`);
-    };
-    
+    // Usamos number para ser consistentes con ChatRoomDto.id
+    const [currentChatId, setCurrentChatId] = useState<number | null>(null); 
+    const [currentChatName, setCurrentChatName] = useState<string>(MOCK_CHAT_NAME);
+
+    // Cargar las salas al montar el componente
+    useEffect(() => {
+        fetchRooms();
+    }, [fetchRooms]);
+
+    // --- MANEJADORES DE CHAT (LÓGICA INTERNA) ---
+
     const handleSendMessage = (text: string) => {
+        if (!currentChatId || !text.trim()) return; 
+
         const newMessage: Message = {
             id: nextId.toString(),
             text,
             sender: 'me',
-            timestamp: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+            timestamp: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }), 
         };
+        
         setMessages(prev => [...prev, newMessage]);
         setNextId(prev => prev + 1);
+        // (Aquí iría la llamada a la API de SignalR/WebSocket)
     };
 
+    // Función que limpia estado y actualiza la sala actual (usada internamente)
+    // 🚨 Usa 'number' ya que ChatRoomDto.id es number.
+    const handleSelectChat = useCallback((id: number) => {
+        const selectedRoom = rooms.find(room => room.id === id);
+        
+        setMessages([]); 
+        setNextId(1);
+        setCurrentChatId(id);
+        setCurrentChatName(selectedRoom?.chatRoomName || `Sala #${id}`);
+        
+        // Navegar a la sala
+        navigate(`/lobby/chat/${id}`); 
+    }, [rooms, navigate]);
+
+
+    // --- MANEJADOR DE CREACIÓN DE SALA (CON ENGAÑO DE TIPOS) ---
     
+    // Esta función recibe el objeto que el formulario *realmente* envía (que asumimos es el DTO
+    // de creación, o un objeto con el nombre), pero TypeScript piensa que recibe ChatRoomDto.
+    // Usaremos 'as any' para tratar el objeto entrante como si contuviera el nombre.
+    const handleRoomCreation: OnRoomCreatedHandler = (roomDataReceived) => {
+        
+        const createAndSync = async () => {
+            try {
+                // 1. EXTRAER EL NOMBRE DEL OBJETO RECIBIDO
+                // Asumo que el formulario te pasa un objeto con la propiedad 'chatRoomName'
+                const chatRoomName: string = (roomDataReceived as any).chatRoomName;
+                
+                if (!chatRoomName) {
+                    throw new Error("El nombre de la sala no se recibió correctamente.");
+                }
+
+                // 2. Crear el objeto DTO para la API
+                const data: CreateRoomDto = { chatRoomName }; 
+                
+                // 3. Llamar a la API
+                const newRoom = await createRoom(data); 
+
+                if (newRoom) {
+                    // 4. Si tiene éxito, la añadimos al estado local y la seleccionamos
+                    addRoom(newRoom); 
+                    console.log(`Sala ${newRoom.chatRoomName} creada en servidor y añadida localmente.`);
+                    
+                    handleSelectChat(newRoom.id); 
+                }
+
+            } catch (error) {
+                console.error("Fallo durante el proceso de creación de la sala:", error);
+                // Lógica de notificación de error aquí
+            }
+        };
+
+        createAndSync();
+    };
 
     return (
         <>
             <LobbyLayout
-                onRoomCreated={handleRoomCreation} 
+                // 🚨 SOLUCIÓN DE TIPADO: Forzamos el tipo. 
+                // La función recibe datos del formulario, pero TypeScript cree que recibe ChatRoomDto.
+                onRoomCreated={handleRoomCreation as any} 
+                
                 chatList={
+                    // 🚨 CHATLIST: Eliminamos onSelectChat, ya que ChatListProps no lo espera.
                     <ChatList 
                         rooms={rooms} 
-                        isLoading={isLoading} 
+                        isLoading={isLoading || isCreating} 
                         error={error} 
                     />
                 }
                 
                 chatArea={
                     <ChatContent
-                        chatName={MOCK_CHAT_NAME}
+                        chatName={currentChatName} 
                         messages={messages}
-                        onSendMessage={handleSendMessage}
+                        onSendMessage={handleSendMessage} 
                     />
                 }
             />

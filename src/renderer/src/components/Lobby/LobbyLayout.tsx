@@ -7,7 +7,7 @@ import { ChatRoomDto } from '@renderer/types'; // Asegúrate de que esta ruta se
 interface LobbyLayoutProps {
     chatList: ReactNode;
     chatArea: ReactNode;
-    onRoomCreated: (newRoom: ChatRoomDto ) => void;
+    onRoomCreated: (chatRoomName: ChatRoomDto ) => void;
 }
 
 /**

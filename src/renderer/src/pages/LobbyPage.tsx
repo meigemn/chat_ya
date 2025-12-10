@@ -1,6 +1,4 @@
-// Frontend/pages/LobbyPage.tsx (CÓDIGO FINAL CORREGIDO)
 import React, { useEffect } from 'react';
-// 🔑 Ya no necesitamos useLocation porque la lógica de fallback está en App.tsx
 import { Outlet } from 'react-router-dom'; 
 import { LobbyLayout } from '@renderer/components/Lobby/LobbyLayout';
 import ChatList from '@renderer/components/Lobby/ChatList';
@@ -11,7 +9,7 @@ const LobbyPage: React.FC = () => {
     // 1. Obtener el estado y la función para añadir salas del hook
     const { rooms, isLoading, error, addRoom, fetchRooms } = useFetchUserRooms();
 
-    // 🔑 Cargar salas al montar el componente
+    // Cargar salas al montar el componente
     useEffect(() => {
         fetchRooms();
     }, [fetchRooms]);
@@ -20,7 +18,7 @@ const LobbyPage: React.FC = () => {
     const chatListContent = (
         <>
             {/* Lista de Salas */}
-            {/* NOTA: Si quisieras que ChatList siempre ocupe el espacio sin scroll, deberías ajustar el layout aquí */}
+            {/* Para que ChatList siempre ocupe el espacio sin scroll,ajustar el layout aquí */}
             <div className="flex-1 min-h-0"> 
                 <ChatList 
                     rooms={rooms} 
@@ -31,7 +29,7 @@ const LobbyPage: React.FC = () => {
         </>
     );
 
-    // 3. 🔑 SOLUCIÓN: El área de chat es simplemente el Outlet.
+    // 3. El área de chat es simplemente el Outlet.
     // El router (App.tsx) se encarga de decidir si Outlet renderiza ChatRoom o DefaultChatArea.
     const chatAreaContent = (
         <Outlet /> 
