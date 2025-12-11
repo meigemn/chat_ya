@@ -1,19 +1,18 @@
+// Frontend/hooks/useChatConnections.ts (CORREGIDO Y RESTAURANDO FUNCIONALIDAD)
+
 import { useState, useEffect, useCallback } from 'react';
 import * as signalR from '@microsoft/signalr';
+import { useAuth } from './useAuth'; 
 
-// Define la estructura de mensajes que el hook devolverá
-interface ChatMessage {
-    id: string; // ID del mensaje
-    user: string; // Nombre del usuario que lo envió
-    text: string; // Contenido del mensaje
-    timestamp: Date; // Timestamp de la recepción
-}
+// 🔑 Importamos el tipo Message desde el archivo central
+import { Message } from '@renderer/types/chat'; 
+
 // NOTA: Asegúrate de que esta URL sea la correcta para tu backend
 const API_BASE_URL = 'https://localhost:7201'; 
 const HUB_URL = `${API_BASE_URL}/chatHub`;
 
 // --- Función Auxiliar para Cargar el Historial ---
-const fetchRoomMessages = async (roomId: number, token: string, setError: (msg: string | null) => void): Promise<ChatMessage[]> => {
+const fetchRoomMessages = async (roomId: number, token: string, currentUserName: string, setError: (msg: string | null) => void): Promise<Message[]> => {
     try {
         const response = await fetch(`${API_BASE_URL}/api/messages/room/${roomId}`, { 
             headers: {
@@ -23,43 +22,48 @@ const fetchRoomMessages = async (roomId: number, token: string, setError: (msg: 
         });
 
         if (!response.ok) {
-            // Manejar errores de respuesta HTTP
             const errorData = await response.json();
             throw new Error(`Error ${response.status}: ${errorData?.Error || "Fallo al obtener mensajes del historial."}`);
         }
 
         const messageDtos = await response.json();
         
-        // Mapear los DTOs del backend (MessageDto) al formato ChatMessage del frontend
-        return messageDtos.map((m: any) => ({
-            id: m.id.toString(),
-            user: m.senderUserName,
-            text: m.content,
-            timestamp: new Date(m.sentDate),
-        })) as ChatMessage[];
+        return messageDtos.map((m: any): Message => {
+            const isMe = m.senderUserName === currentUserName;
+            
+            return {
+                id: m.id.toString(),
+                text: m.content,
+                // 🔑 CORRECCIÓN DE ESTILO: Asignamos 'me' o 'other' para facilitar el estilo UI
+                sender: isMe ? 'me' : 'other', 
+                timestamp: m.sentDate, 
+            };
+        });
 
     } catch (e: any) {
         console.error("Error al cargar mensajes históricos:", e);
         setError(`Error al cargar historial: ${e.message}`);
-        return []; // Devuelve un array vacío en caso de fallo
+        return [];
     }
 };
 // --- FIN Función Auxiliar ---
 
 
 export const useChatConnection = (roomId: number) => {
+    const { user } = useAuth(); 
+    const currentUserName = user?.userName; 
+    
     const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
-    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]); 
     const [isConnected, setIsConnected] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // 1. Inicializar, conectar al Hub y cargar historial (dependiente de roomId)
+    // 1. Conexión y Carga de Historial (Depende de roomId y currentUserName)
     useEffect(() => {
-        // Limpiar el estado de mensajes inmediatamente al cambiar de sala
         setMessages([]); 
-        setError(null); // Limpiar errores anteriores
+        setError(null); 
 
-        if (roomId <= 0) {
+        if (roomId <= 0 || !currentUserName) { 
             return;
         }
 
@@ -69,7 +73,6 @@ export const useChatConnection = (roomId: number) => {
             return;
         }
 
-        // Crear la nueva conexión
         const newConnection = new signalR.HubConnectionBuilder()
             .withUrl(HUB_URL, {
                 accessTokenFactory: () => token
@@ -81,18 +84,15 @@ export const useChatConnection = (roomId: number) => {
         
         let cleanupExecuted = false;
 
-        // Función para iniciar la conexión y cargar el chat
         const startConnectionAndLoadChat = async () => {
             try {
                 await newConnection.start();
                 console.log(`Conectado al Hub. Intentando unirse a Sala ${roomId}...`);
                 setIsConnected(true);
 
-                // 2. Cargar mensajes históricos del REST API
-                const historicalMessages = await fetchRoomMessages(roomId, token, setError);
+                const historicalMessages = await fetchRoomMessages(roomId, token, currentUserName, setError);
                 setMessages(historicalMessages);
 
-                // 3. Unirse a la sala de SignalR para recibir nuevos mensajes
                 await newConnection.invoke('JoinRoom', roomId.toString());
                 console.log(`Unido a la sala ${roomId} en SignalR.`);
 
@@ -107,42 +107,43 @@ export const useChatConnection = (roomId: number) => {
 
         startConnectionAndLoadChat();
 
-
-        // 4. Limpiar al desmontar o al cambiar de dependencia (roomId)
         return () => {
             cleanupExecuted = true;
             if (newConnection) {
-                // Se detiene la conexión anterior
                 newConnection.stop()
                     .then(() => console.log(`Desconectado de SignalR al cambiar de sala ${roomId}`))
                     .catch(e => console.error("Error al detener la conexión:", e));
             }
         };
-    }, [roomId]);
+    }, [roomId, currentUserName]); 
 
 
-    // 5. Configurar la recepción de mensajes (solo necesita re-ejecutarse si 'connection' cambia)
+    // 5. Configurar la recepción de mensajes (Depende de connection y currentUserName)
     useEffect(() => {
-        if (!connection) return;
-
-        // Quitar cualquier listener anterior antes de agregar uno nuevo (es una buena práctica)
+        if (!connection || !currentUserName) return; 
+        
         connection.off('ReceiveMessage');
 
-        // Método que el Hub de C# debe llamar ('ReceiveMessage')
         connection.on('ReceiveMessage', (messageId: string, user: string, text: string) => {
             console.log(`Mensaje recibido: ${user}: ${text}`);
 
-            const newMessage: ChatMessage = {
-                id: messageId, // El ID generado por el backend
-                user: user,
+            const isMe = user === currentUserName;
+            const now = new Date().toISOString(); 
+
+            // Creamos el mensaje usando el tipo Message importado
+            const newMessage: Message = {
+                id: messageId,
                 text: text,
-                timestamp: new Date(),
+                // 🔑 CORRECCIÓN DE ESTILO: Asignamos 'me' o 'other'
+                sender: isMe ? 'me' : 'other', 
+                timestamp: now, 
             };
-            // 🔑 ¡Añadir el nuevo mensaje al final de la lista!
+            
+            // 🔑 ¡ESTE ES EL CÓDIGO CLAVE PARA EL TIEMPO REAL! 
+            // Esto asegura que el mensaje se añada a la lista
             setMessages(prevMessages => [...prevMessages, newMessage]);
         });
 
-        // Opcional: Manejar errores de conexión en tiempo real
         connection.onclose((error) => {
             if (error) {
                 console.error("Conexión cerrada con error:", error);
@@ -151,17 +152,15 @@ export const useChatConnection = (roomId: number) => {
             setIsConnected(false);
         });
 
-        // Limpieza de listener
         return () => {
             connection.off('ReceiveMessage');
         };
-    }, [connection]);
+    }, [connection, currentUserName]); // 🔑 DEPENDENCIAS CORRECTAS: Aseguran que el listener se reestablece al reconectar o cambiar de usuario
 
 
     // 6. Función para enviar mensajes
     const sendMessage = useCallback((text: string) => {
         if (connection && isConnected && text.trim()) {
-            // El backend debe manejar la lógica de Broadcast a la sala específica (roomId).
             connection.invoke('SendMessage', roomId.toString(), text)
                 .catch(err => {
                     console.error('Error al enviar mensaje:', err);

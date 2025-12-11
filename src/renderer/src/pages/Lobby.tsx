@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LobbyLayout } from '../components/Lobby/LobbyLayout';
-import ChatContent from '../components/Chat/ChatContent/Index';
+import ChatContent from '../components/Chat/ChatContent';
 import ChatList from '../components/Lobby/ChatList';
 import { Message } from '@renderer/types/chat'; 
 import { ChatRoomDto, CreateRoomDto } from '@renderer/types'; 
