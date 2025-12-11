@@ -16,7 +16,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({ text, sender, timestam
                 <p>{text}</p>
                 {timestamp && (
                     <p className={`text-xs mt-1 ${sender === 'me' ? 'text-blue-200' : 'text-gray-500'}`}>
-                        {timestamp}
+                        {new Date(timestamp).toLocaleTimeString().slice(0, 4)}
                     </p>
                 )}
             </div>
