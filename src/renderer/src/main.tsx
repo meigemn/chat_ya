@@ -3,15 +3,18 @@ import './assets/main.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
-import { BrowserRouter } from 'react-router-dom';
+// 🔑 CAMBIO CLAVE: Importar HashRouter en lugar de BrowserRouter
+import { HashRouter } from 'react-router-dom'; 
 import './index.css'
 import AuthProvider from './hooks/useAuth';
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
-    </BrowserRouter>
+    {/* 🔑 USAR HASHROUTER para compatibilidad con Electron (archivos locales) */}
+    <HashRouter>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </HashRouter>
   </StrictMode>
 )

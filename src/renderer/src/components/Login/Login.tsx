@@ -131,9 +131,13 @@ export default function Login() {
                     Credenciales:
                     <ul className="list-disc list-inside text-sm text-gray-700">
                         <li className='select-text '>
-                            Email: usuarioChatYa@gmail.com
+                            Email 1: usuarioChatYa@gmail.com
+                        </li>
+                        <li className='select-text '>
+                            Email 2: Usuario2@gmail.com
                         </li>
                         <li className='select-text '>Contraseña: usuarioChatYa1234! </li>
+                        <li className='select-text '>Contraseña: Usuario2!!!</li>
                     </ul>
                 </div>
 
