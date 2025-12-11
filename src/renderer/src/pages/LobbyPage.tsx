@@ -7,9 +7,8 @@ import { useParams } from 'react-router-dom';
 import { LobbyLayout } from '@renderer/components/Lobby/LobbyLayout';
 import ChatList from '@renderer/components/Lobby/ChatList';
 import ChatContent from '@renderer/components/Chat/ChatContent';
-import { useFetchUserRooms } from '@renderer/hooks/useRoomActions';
+import { useFetchUserRooms } from '@renderer/hooks/useRoomActions'; // Asegúrate que la ruta es correcta
 import { useChatConnection } from '@renderer/hooks/useChatConnections';
-
 // #region Componente por Defecto (Área de Chat vacía)
 const DefaultChatArea: React.FC = () => (
     <div className="flex items-center justify-center h-full bg-gray-200 rounded-lg">
@@ -32,7 +31,11 @@ const LobbyPage: React.FC = () => {
         messages,
         isConnected,
         error: chatError,
-        sendMessage
+        sendMessage,
+        // 🔑 AGREGAMOS LAS PROPIEDADES DE LAZY LOADING
+        loadMoreMessages,
+        hasMoreMessages,
+        isLoadingMore,
     } = useChatConnection(activeRoomId);
 
     // Buscar el nombre de la sala actual para la cabecera
@@ -76,7 +79,7 @@ const LobbyPage: React.FC = () => {
                     </p>
                 </div>
             );
-        } else if (!isConnected) {
+        } else if (!isConnected && messages.length === 0) {
             // Estado de conectando (antes de unirse)
             chatAreaContent = (
                 <div className="p-8 text-center bg-yellow-100 h-full flex items-center justify-center rounded-lg">
@@ -89,11 +92,17 @@ const LobbyPage: React.FC = () => {
         else {
             // Conectado y listo para chatear
             chatAreaContent = (
+                // 🔑 AHORA PASAMOS TODAS LAS PROPIEDADES REQUERIDAS POR CHATCONTENT
                 <ChatContent
                     chatName={chatName}
                     messages={messages}
                     onSendMessage={sendMessage}
                     isSendingDisabled={!isConnected}
+                    
+                    // 🔑 Propiedades de Lazy Loading
+                    loadMoreMessages={loadMoreMessages}
+                    hasMoreMessages={hasMoreMessages}
+                    isLoadingMore={isLoadingMore}
                 />
             );
         }
@@ -114,7 +123,7 @@ const LobbyPage: React.FC = () => {
         <LobbyLayout
             chatList={chatListContent}
             chatArea={chatAreaContent}
-            onRoomCreated={addRoom}
+            onRoomCreated={addRoom} // Asumiendo que esta es una función para actualizar la lista de salas después de la creación
         />
     );
     // #endregion

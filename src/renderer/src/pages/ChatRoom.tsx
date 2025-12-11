@@ -1,5 +1,3 @@
-// Frontend/pages/ChatRoom.tsx (SOLUCIÓN FINAL CON SIGNALR INTEGRADO)
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import ChatContent from '@renderer/components/Chat/ChatContent';
@@ -16,12 +14,15 @@ const ChatRoom: React.FC = () => {
     const { rooms } = useFetchUserRooms(); 
 
     // 3. Conexión de SignalR (La fuente de verdad de los mensajes)
-    // Este hook maneja la reconexión, la carga de historial y la suscripción a mensajes.
     const { 
         messages, 
         isConnected, 
         error, 
-        sendMessage 
+        sendMessage,
+        // 🔑 AGREGAMOS LAS PROPIEDADES DE LAZY LOADING
+        loadMoreMessages,
+        hasMoreMessages,
+        isLoadingMore,
     } = useChatConnection(roomId);
     
     // --- Lógica de la interfaz y estado ---
@@ -67,6 +68,11 @@ const ChatRoom: React.FC = () => {
             messages={messages} // ⬅️ Lista de mensajes actualizada por SignalR
             onSendMessage={sendMessage} // ⬅️ Función de envío del hook de SignalR
             isSendingDisabled={!isConnected}
+            
+            // 🔑 PASANDO LAS PROPIEDADES DE LAZY LOADING
+            loadMoreMessages={loadMoreMessages}
+            hasMoreMessages={hasMoreMessages}
+            isLoadingMore={isLoadingMore}
         />
     );
 };
