@@ -18,14 +18,13 @@ const MOCK_CHAT_NAME = "Grupo de Desarrolladores";
 const Lobby: React.FC = () => {
     const navigate = useNavigate();
 
-    // --- LÓGICA DE SALAS Y API ---
+    // Salas y api
     const { rooms, addRoom, isLoading, error, fetchRooms } = useFetchUserRooms();
     const { createRoom, isLoading: isCreating } = useCreateRoom();
 
-    // --- LÓGICA DE CHAT Y ESTADO LOCAL ---
+    // Logica de chat y estado actual
     const [messages, setMessages] = useState<Message[]>([]);
     const [nextId, setNextId] = useState(1);
-    // Usamos number para ser consistentes con ChatRoomDto.id
     const [currentChatId, setCurrentChatId] = useState<number | null>(null);
     const [currentChatName, setCurrentChatName] = useState<string>(MOCK_CHAT_NAME);
 
@@ -34,7 +33,7 @@ const Lobby: React.FC = () => {
         fetchRooms();
     }, [fetchRooms]);
 
-    // --- MANEJADORES DE CHAT (LÓGICA INTERNA) ---
+    // #region Manejadores de chat (logica interna)
 
     const handleSendMessage = (text: string) => {
         if (!currentChatId || !text.trim()) return;
@@ -48,9 +47,8 @@ const Lobby: React.FC = () => {
 
         setMessages(prev => [...prev, newMessage]);
         setNextId(prev => prev + 1);
-        // (Aquí iría la llamada a la API de SignalR/WebSocket)
     };
-
+    //#endregion 
     // Función que limpia estado y actualiza la sala actual (usada internamente)
     const handleSelectChat = useCallback((id: number) => {
         const selectedRoom = rooms.find(room => room.id === id);
@@ -67,7 +65,7 @@ const Lobby: React.FC = () => {
 
     // --- MANEJADOR DE CREACIÓN DE SALA (CON ENGAÑO DE TIPOS) ---
 
-    // Esta función recibe el objeto que el formulario *realmente* envía 
+    // Recibe el objeto que el formulario *realmente* envía 
     // pero TypeScript piensa que recibe ChatRoomDto.
     // Usaremos 'as any' para tratar el objeto entrante como si contuviera el nombre.
     const handleRoomCreation: OnRoomCreatedHandler = (roomDataReceived) => {
@@ -124,7 +122,7 @@ const Lobby: React.FC = () => {
                         chatName={currentChatName}
                         messages={messages}
                         onSendMessage={handleSendMessage}
-                        // 🔑 Valores de Mock para las nuevas props
+                        // Valores de Mock para las nuevas props
                         loadMoreMessages={() => console.log('Mock Load More')}
                         hasMoreMessages={false} // No hay más mensajes en el mock
                         isLoadingMore={false}

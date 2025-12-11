@@ -1,15 +1,10 @@
-// Frontend/pages/LobbyPage.tsx (ORDENADO POR REGIONES)
-
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-
-// Importaciones de Componentes y Hooks
 import { LobbyLayout } from '@renderer/components/Lobby/LobbyLayout';
 import ChatList from '@renderer/components/Lobby/ChatList';
 import ChatContent from '@renderer/components/Chat/ChatContent';
-import { useFetchUserRooms } from '@renderer/hooks/useRoomActions'; // Asegúrate que la ruta es correcta
+import { useFetchUserRooms } from '@renderer/hooks/useRoomActions'; 
 import { useChatConnection } from '@renderer/hooks/useChatConnections';
-// #region Componente por Defecto (Área de Chat vacía)
 const DefaultChatArea: React.FC = () => (
     <div className="flex items-center justify-center h-full bg-gray-200 rounded-lg">
         <p className="text-xl text-gray-600">Selecciona una sala para empezar a chatear.</p>
@@ -32,7 +27,7 @@ const LobbyPage: React.FC = () => {
         isConnected,
         error: chatError,
         sendMessage,
-        // 🔑 AGREGAMOS LAS PROPIEDADES DE LAZY LOADING
+        // Propiedades de lazyloading
         loadMoreMessages,
         hasMoreMessages,
         isLoadingMore,
@@ -92,14 +87,14 @@ const LobbyPage: React.FC = () => {
         else {
             // Conectado y listo para chatear
             chatAreaContent = (
-                // 🔑 AHORA PASAMOS TODAS LAS PROPIEDADES REQUERIDAS POR CHATCONTENT
+
                 <ChatContent
                     chatName={chatName}
                     messages={messages}
                     onSendMessage={sendMessage}
                     isSendingDisabled={!isConnected}
                     
-                    // 🔑 Propiedades de Lazy Loading
+                    // Propiedades de Lazy Loading
                     loadMoreMessages={loadMoreMessages}
                     hasMoreMessages={hasMoreMessages}
                     isLoadingMore={isLoadingMore}
@@ -123,7 +118,7 @@ const LobbyPage: React.FC = () => {
         <LobbyLayout
             chatList={chatListContent}
             chatArea={chatAreaContent}
-            onRoomCreated={addRoom} // Asumiendo que esta es una función para actualizar la lista de salas después de la creación
+            onRoomCreated={addRoom} 
         />
     );
     // #endregion

@@ -1,19 +1,23 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import ChatContent from '@renderer/components/Chat/ChatContent';
-// 🔑 IMPORTAR HOOKS CRUCIALES
 import { useChatConnection } from '@renderer/hooks/useChatConnections'; // Para SignalR y mensajes
 import { useFetchUserRooms } from '@renderer/hooks/useRoomActions'; // Para obtener el nombre de la sala
 
 const ChatRoom: React.FC = () => {
-    // 1. Obtener el ID de la sala de la URL
+    // #region1. Obtener el ID de la sala de la URL
+    
     const { id } = useParams<{ id: string }>();
     const roomId = id ? parseInt(id, 10) : 0;
-    
-    // 2. Obtener la lista de salas (para saber el nombre)
-    const { rooms } = useFetchUserRooms(); 
+    // #endregion
 
-    // 3. Conexión de SignalR (La fuente de verdad de los mensajes)
+    //#region 2. Obtener la lista de salas (para saber el nombre) 
+    
+    const { rooms } = useFetchUserRooms(); 
+    // #endregion
+
+    // #region 3. Conexión de SignalR (La fuente de verdad de los mensajes)
+    
     const { 
         messages, 
         isConnected, 
@@ -24,13 +28,15 @@ const ChatRoom: React.FC = () => {
         hasMoreMessages,
         isLoadingMore,
     } = useChatConnection(roomId);
-    
-    // --- Lógica de la interfaz y estado ---
+    // #endregion
+
+    // #region Logica de la interfaz y estado
     
     const currentRoom = rooms.find(r => r.id === roomId);
     const chatName = currentRoom?.chatRoomName || `Sala ${roomId}`; 
-    
-    // Mostrar un estado de error o carga/conexión
+    //#endregion
+
+    // #region Mostrar un estado de error o carga/conexión
     if (roomId === 0 || !currentRoom) {
         return (
             <div className="p-4 flex items-center justify-center h-full bg-gray-100 rounded-lg">
@@ -60,8 +66,8 @@ const ChatRoom: React.FC = () => {
             </div>
         );
     }
-
-    // 4. Renderizar el área de chat con los datos en tiempo real
+    //#endregion
+    // #region 4. Renderizar el área de chat con los datos en tiempo real
     return (
         <ChatContent
             chatName={chatName}
@@ -75,6 +81,7 @@ const ChatRoom: React.FC = () => {
             isLoadingMore={isLoadingMore}
         />
     );
+    // #endregion 
 };
 
 export default ChatRoom;

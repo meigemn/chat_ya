@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useCallback, useLayoutEffect } from 'react';
 import { MessageItem } from './MessageItem';
-import { MessageListProps } from '@renderer/types/chat'; // Asegúrate de que MessageListProps incluya las nuevas props
+import { MessageListProps } from '@renderer/types/chat'; 
 
 // Definición extendida de las propiedades que MessageList necesita ahora
 interface ExtendedMessageListProps extends MessageListProps {

@@ -7,11 +7,11 @@ const API_BASE_URL = 'https://localhost:7201';
 const HUB_URL = `${API_BASE_URL}/chatHub`;
 const PAGE_SIZE = 10; // Cantidad de mensajes a cargar por petición
 
-// --- Función Auxiliar para la Carga Inicial (Solo llamada desde useEffect inicial) ---
+// #region --- Función Auxiliar para la Carga Inicial (Solo llamada desde useEffect inicial) ---
 // La separamos para que la lógica de carga inicial no dependa del estado de paginación del hook.
 const fetchInitialMessages = async (
-    roomId: number, 
-    token: string, 
+    roomId: number,
+    token: string,
     setError: (msg: string | null) => void
 ): Promise<Message[]> => {
     try {
@@ -42,9 +42,7 @@ const fetchInitialMessages = async (
         return [];
     }
 };
-// --- FIN Función Auxiliar ---
-
-
+//#endregion
 export const useChatConnection = (roomId: number) => {
     const { user } = useAuth();
 
@@ -62,9 +60,9 @@ export const useChatConnection = (roomId: number) => {
     // #endregion
 
     // #region Función de Carga de Mensajes para Paginación (fetchMoreMessages)
-    // CRÍTICO: Esta función SIEMPRE debe ser usada por loadMoreMessages y depende de los estados de paginación
+    // Esta función SIEMPRE debe ser usada por loadMoreMessages y depende de los estados de paginación
     const fetchMoreMessages = useCallback(async (skip: number, take: number): Promise<Message[]> => {
-        
+
         // No es necesario verificar hasMoreMessages ni isLoadingMore aquí,
         // ya que loadMoreMessages lo hace. Solo manejamos la lógica del fetch.
         setIsLoadingMore(true);
@@ -116,7 +114,7 @@ export const useChatConnection = (roomId: number) => {
         } finally {
             setIsLoadingMore(false);
         }
-    }, [roomId]); // 🔑 CRÍTICO: SOLO depende de roomId. No de hasMoreMessages o isLoadingMore, para evitar bucles.
+    }, [roomId]); // Solo depende de roomId para evitar bucles.
     // #endregion
 
     // #region Lógica de Carga de Más Mensajes (Lazy Loading Inverso)
@@ -151,8 +149,8 @@ export const useChatConnection = (roomId: number) => {
 
         const token = localStorage.getItem('authToken');
         if (!token) {
-             setError("No se encontró el token de autenticación.");
-             return;
+            setError("No se encontró el token de autenticación.");
+            return;
         }
 
         // 1. Crear conexión
@@ -200,7 +198,7 @@ export const useChatConnection = (roomId: number) => {
                 // 3b. Cargar Historial Inicial (Usando la función auxiliar no memoizada/self-contained)
                 const initialMessages = await fetchInitialMessages(roomId, token, setError);
                 setMessages(initialMessages);
-                
+
                 // 3c. Actualizar el estado de conteo de mensajes después de la carga inicial
                 setMessagesLoadedCount(initialMessages.length);
                 if (initialMessages.length < PAGE_SIZE) {
@@ -229,8 +227,7 @@ export const useChatConnection = (roomId: number) => {
                 newConnection.stop().catch(e => console.error("Error al detener la conexión:", e));
             }
         };
-    // 🔑 CRÍTICO: Ya no se incluye fetchMessages. Solo dependemos de roomId y user.
-    }, [roomId, user?.userName]); 
+    }, [roomId, user?.userName]);
     // #endregion
 
 
