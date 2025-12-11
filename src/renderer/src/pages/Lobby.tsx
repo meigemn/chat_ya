@@ -52,7 +52,6 @@ const Lobby: React.FC = () => {
     };
 
     // Función que limpia estado y actualiza la sala actual (usada internamente)
-    // 🚨 Usa 'number' ya que ChatRoomDto.id es number.
     const handleSelectChat = useCallback((id: number) => {
         const selectedRoom = rooms.find(room => room.id === id);
         
@@ -68,15 +67,14 @@ const Lobby: React.FC = () => {
 
     // --- MANEJADOR DE CREACIÓN DE SALA (CON ENGAÑO DE TIPOS) ---
     
-    // Esta función recibe el objeto que el formulario *realmente* envía (que asumimos es el DTO
-    // de creación, o un objeto con el nombre), pero TypeScript piensa que recibe ChatRoomDto.
+    // Esta función recibe el objeto que el formulario *realmente* envía 
+    // pero TypeScript piensa que recibe ChatRoomDto.
     // Usaremos 'as any' para tratar el objeto entrante como si contuviera el nombre.
     const handleRoomCreation: OnRoomCreatedHandler = (roomDataReceived) => {
         
         const createAndSync = async () => {
             try {
-                // 1. EXTRAER EL NOMBRE DEL OBJETO RECIBIDO
-                // Asumo que el formulario te pasa un objeto con la propiedad 'chatRoomName'
+                // 1. Extraer el nombre del objeto recibido
                 const chatRoomName: string = (roomDataReceived as any).chatRoomName;
                 
                 if (!chatRoomName) {
@@ -99,7 +97,7 @@ const Lobby: React.FC = () => {
 
             } catch (error) {
                 console.error("Fallo durante el proceso de creación de la sala:", error);
-                // Lógica de notificación de error aquí
+                
             }
         };
 
@@ -109,12 +107,11 @@ const Lobby: React.FC = () => {
     return (
         <>
             <LobbyLayout
-                // 🚨 SOLUCIÓN DE TIPADO: Forzamos el tipo. 
+                // Solucion de tipado: Forzamos el tipo. 
                 // La función recibe datos del formulario, pero TypeScript cree que recibe ChatRoomDto.
                 onRoomCreated={handleRoomCreation as any} 
                 
                 chatList={
-                    // 🚨 CHATLIST: Eliminamos onSelectChat, ya que ChatListProps no lo espera.
                     <ChatList 
                         rooms={rooms} 
                         isLoading={isLoading || isCreating} 
