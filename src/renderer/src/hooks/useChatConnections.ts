@@ -63,8 +63,6 @@ export const useChatConnection = (roomId: number) => {
     // Esta función SIEMPRE debe ser usada por loadMoreMessages y depende de los estados de paginación
     const fetchMoreMessages = useCallback(async (skip: number, take: number): Promise<Message[]> => {
 
-        // No es necesario verificar hasMoreMessages ni isLoadingMore aquí,
-        // ya que loadMoreMessages lo hace. Solo manejamos la lógica del fetch.
         setIsLoadingMore(true);
         setError(null);
 

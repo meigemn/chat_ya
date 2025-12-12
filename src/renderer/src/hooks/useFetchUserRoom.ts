@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ChatRoomDto } from '@renderer/types'; 
-import apiClient from '@renderer/api/apiClient'; // Importar la función de fetch autenticado
+import apiClient from '@renderer/api/apiClient';
 export const useFetchUserRooms = () => {
     const [rooms, setRooms] = useState<ChatRoomDto[]>([]);
     const [isLoading, setIsLoading] = useState(true);
