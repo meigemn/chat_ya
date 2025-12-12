@@ -22,7 +22,7 @@ export const MessageList: React.FC<ExtendedMessageListProps> = ({
     // Referencia al contenedor que tiene el scroll
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
-    // Referencias para el mantenimiento de la posición del scroll (CRUCIAL)
+    // Referencias para el mantenimiento de la posición del scroll 
     const prevScrollHeightRef = useRef(0);
     const initialLoadRef = useRef(true);
 
@@ -38,7 +38,7 @@ export const MessageList: React.FC<ExtendedMessageListProps> = ({
         // Detectar si el usuario está cerca de la parte superior (e.g., a menos de 10 píxeles)
         if (container.scrollTop <= 10) {
             console.log("Lazy Load: Tope detectado. Cargando más...");
-            loadMoreMessages(); // Llama a la función del hook
+            loadMoreMessages(); 
         }
     }, [isLoadingMore, hasMoreMessages, loadMoreMessages]);
 
@@ -93,7 +93,7 @@ export const MessageList: React.FC<ExtendedMessageListProps> = ({
         // Aplicamos la referencia (ref) al div que maneja el scroll
         <div
             ref={chatContainerRef}
-            className="flex-1 p-4 overflow-y-auto space-y-2 flex flex-col" // Añadido 'flex flex-col' para que los hijos funcionen bien
+            className="flex-1 p-4 overflow-y-auto space-y-2 flex flex-col"
         >
 
             {isLoadingMore && (

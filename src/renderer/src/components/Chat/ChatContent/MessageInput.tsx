@@ -1,4 +1,3 @@
-// src/components/Chat/ChatContent/MessageInput.tsx
 import React, { useState } from 'react';
 import { MessageInputProps } from '@renderer/types/chat';
 export const MessageInput: React.FC<MessageInputProps> = ({ onSend,isDisabled }) => {

@@ -1,4 +1,3 @@
-// src/components/Chat/ChatContent/ChatHeader.tsx
 import React from 'react';
 
 interface ChatHeaderProps {

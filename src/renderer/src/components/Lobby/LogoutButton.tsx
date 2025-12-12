@@ -1,5 +1,4 @@
 import React from 'react';
-// 🔑 Importamos useAuth para acceder a la función logout()
 import { useAuth } from '../../hooks/useAuth'; 
 
 const LogOutIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -33,7 +32,7 @@ export default function LogoutButton() {
 
     return (
         <button
-            onClick={handleLogout} // Llama a la función de cierre de sesión
+            onClick={handleLogout} 
             className='rounded-md border-2 border-red-500 ml-4 px-4 py-2 text-red-500 hover:bg-red-500 hover:text-white transition h-[7vh] w-[12vw] flex items-center justify-center font-medium'
         >
             <LogOutIcon />

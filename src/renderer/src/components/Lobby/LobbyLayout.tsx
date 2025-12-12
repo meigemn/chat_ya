@@ -1,8 +1,7 @@
-// LobbyLayout.tsx (CORREGIDO)
 import React, { ReactNode } from 'react';
 import CreateRoomButton from './CreateRoomButton';
 import LogoutButton from './LogoutButton';
-import { ChatRoomDto } from '@renderer/types'; // Asegúrate de que esta ruta sea correcta
+import { ChatRoomDto } from '@renderer/types'; 
 
 interface LobbyLayoutProps {
     chatList: ReactNode;

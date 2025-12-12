@@ -5,7 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { ILoginRequest, ILoginResponse, IGenericError, User } from '@renderer/types/auth'; 
 import { API_BASE_URL } from '../../api/apiClient';
 
-// Componente SVG para el icono de "Mostrar Contraseña" (Ojo abierto)
+// SVG "Mostrar Contraseña"
 const EyeIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg 
         {...props} 
@@ -25,7 +25,7 @@ const EyeIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
-// Componente SVG para el icono de "Ocultar Contraseña" (Ojo tachado)
+// SVG Ojo tachado
 const EyeSlashIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg 
         {...props} 
@@ -48,7 +48,7 @@ const EyeSlashIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function Login() {
-    // 1. HOOKS DE NAVEGACIÓN Y AUTENTICACIÓN
+    // 1. Hooks de navegacion y autenticacion
     //  Obtener el estado y la función 'login' del contexto
     const { login, isAuthenticated } = useAuth(); 
     const navigate = useNavigate();

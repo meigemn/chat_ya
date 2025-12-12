@@ -1,4 +1,3 @@
-// Frontend/components/ChatList.tsx (Nuevo Archivo)
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChatRoomDto } from '@renderer/types';
