@@ -3,8 +3,7 @@ import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom'; 
 import { useAuth } from '../../hooks/useAuth'; 
 import { ILoginRequest, ILoginResponse, IGenericError, User } from '@renderer/types/auth'; 
-
-const API_BASE_URL = 'https://localhost:7201'; 
+import { API_BASE_URL } from '../../api/apiClient';
 
 // Componente SVG para el icono de "Mostrar Contraseña" (Ojo abierto)
 const EyeIcon = (props: React.SVGProps<SVGSVGElement>) => (
